@@ -25,7 +25,7 @@ bool Win() {
     }
     if (board[0][0] == board[1][1] && board[1][1] == board[2][2]) return true;
     if (board[0][2] == board[1][1] && board[1][1] == board[2][0]) return true;
-    
+
     return false;
 }
 
@@ -36,6 +36,12 @@ bool Draw() {
         }
     }
     return true;
+}
+
+void ResetBoard() {
+    char initialBoard[SIZE][SIZE] = {{'1', '2', '3'}, {'4', '5', '6'}, {'7', '8', '9'}};
+    memcpy(board, initialBoard, sizeof(board));
+    currentPlayer = 'X';
 }
 
 void Move(int choice) {
@@ -50,18 +56,18 @@ void Move(int choice) {
 
 void PlayerName() {
     clear();
-    
-	int height = 7;
-	int width = 50;
-	int start_y = (LINES - height) / 2;
-	int start_x = (COLS - width) / 2;
-	
+
+    int height = 7;
+    int width = 50;
+    int start_y = (LINES - height) / 2;
+    int start_x = (COLS - width) / 2;
+
     WINDOW *menu_win = newwin(height, width, start_y, start_x);
-	box(menu_win, 0, 0);
-	mvwprintw(menu_win, 0, 1, "[ Enter Your Name ]");
-	refresh();
-	wrefresh(menu_win);
-	
+    box(menu_win, 0, 0);
+    mvwprintw(menu_win, 0, 1, "[ Enter Your Name ]");
+    refresh();
+    wrefresh(menu_win);
+
     mvprintw(13, 37, "Enter name for Player 1 (X): ");
     echo();
     getnstr(player1Name, 49);
@@ -71,7 +77,6 @@ void PlayerName() {
 }
 
 void playTicTacToe() {
-	
     int maxY, maxX;
     getmaxyx(stdscr, maxY, maxX);
 
@@ -112,6 +117,7 @@ void playTicTacToe() {
         }
     }
     getch();
+    clear();
 }
 
 void Loding() {
@@ -133,34 +139,40 @@ void Loding() {
     clear();
 }
 
-void Menu() {
+int main() {
+    initscr();
+    noecho();
+    cbreak();
+    keypad(stdscr, TRUE);
+
     const char *choices[] = {"1. Start", "2. Exit"};
     int n_choices = sizeof(choices) / sizeof(choices[0]);
     int highlight = 0;
     int c;
 
     int height = 6;
-	int width = 20;
-	int start_y = (LINES - height) / 2;
-	int start_x = (COLS - width) / 2;
-	
-	WINDOW *menu_win = newwin(height, width, start_y, start_x);
-	box(menu_win, 0, 0);
-	mvwprintw(menu_win, 0, 1, "[ MENU OPTIONS ]");
-	refresh();
-	wrefresh(menu_win);
+    int width = 20;
+    int start_y = (LINES - height) / 2;
+    int start_x = (COLS - width) / 2;
 
-	while (1) {
-		for (int i = 0; i < n_choices; i++) {
-	            if (i == highlight) {
-	                attron(A_REVERSE);
-	                mvprintw(i + 14, 55, "%s", choices[i]);
-	                attroff(A_REVERSE);
-	            } else {
-	                mvprintw(i + 14, 55, "%s", choices[i]);
-	            }
-	        }
-	        refresh();
+    while (1) {
+        clear();
+        WINDOW *menu_win = newwin(height, width, start_y, start_x);
+        box(menu_win, 0, 0);
+        mvwprintw(menu_win, 0, 1, "[ MENU OPTIONS ]");
+        refresh();
+        wrefresh(menu_win);
+
+        for (int i = 0; i < n_choices; i++) {
+            if (i == highlight) {
+                attron(A_REVERSE);
+                mvprintw(i + 14, 55, "%s", choices[i]);
+                attroff(A_REVERSE);
+            } else {
+                mvprintw(i + 14, 55, "%s", choices[i]);
+            }
+        }
+        refresh();
 
         c = getch();
         if (c == KEY_UP) {
@@ -172,22 +184,15 @@ void Menu() {
                 Loding();
                 PlayerName();
                 playTicTacToe();
+                ResetBoard();
+                Loding();
             } else if (highlight == 1) {
                 endwin();
+                break;
             }
-            break;
         }
     }
-}
-
-int main() {
-    initscr();
-    noecho();
-    cbreak();
-    keypad(stdscr, TRUE);
-
-    Menu();
 
     endwin();
-    return 0;
+    return 0;
 }
